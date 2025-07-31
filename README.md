@@ -61,6 +61,11 @@ A real-time polling system built with React, Express.js, and Socket.io for inter
 
 This will start both the backend server (port 5000) and frontend development server (port 3000).
 
+## Live Demo
+
+- **Frontend**: [https://intervue-assignment-coral.vercel.app/](https://intervue-assignment-coral.vercel.app/)
+- **Backend**: [https://intervue-assignment-c5gd.onrender.com/](https://intervue-assignment-c5gd.onrender.com/)
+
 ### Manual Setup
 
 If you prefer to set up manually:

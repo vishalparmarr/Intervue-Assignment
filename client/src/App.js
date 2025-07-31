@@ -6,7 +6,7 @@ import StudentDashboard from './components/StudentDashboard';
 import Welcome from './components/Welcome';
 import './App.css';
 
-const SOCKET_URL = 'http://localhost:5000';
+const SOCKET_URL = 'https://intervue-assignment-c5gd.onrender.com';
 
 function App() {
   const [socket, setSocket] = useState(null);
