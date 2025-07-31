@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, CheckCircle, MessageSquare } from 'lucide-react';
+import { Clock, CheckCircle, MessageSquare, LogOut } from 'lucide-react';
 import PollQuestion from './PollQuestion';
 import PollResults from './PollResults';
 import Chat from './Chat';
@@ -106,7 +106,17 @@ const StudentDashboard = ({ socket, userData, onReturnHome }) => {
       <header className="header">
         <div className="header-content">
           <div className="logo">Live Polling System</div>
-          <div className="user-info">Student: {userData.name}</div>
+          <div className="user-info">
+            Student: {userData.name}
+            <button 
+              className="btn btn-exit" 
+              onClick={onReturnHome}
+              title="Exit to Home"
+            >
+              <LogOut size={16} />
+              Exit
+            </button>
+          </div>
         </div>
       </header>
 

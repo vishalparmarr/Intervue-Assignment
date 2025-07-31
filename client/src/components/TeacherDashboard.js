@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Users, BarChart3, MessageSquare, X } from 'lucide-react';
+import { Plus, Users, BarChart3, MessageSquare, X, LogOut } from 'lucide-react';
 import CreatePoll from './CreatePoll';
 import PollResults from './PollResults';
 import StudentList from './StudentList';
 import Chat from './Chat';
 
-const TeacherDashboard = ({ socket, userData }) => {
+const TeacherDashboard = ({ socket, userData, onReturnHome }) => {
   const [activePoll, setActivePoll] = useState(null);
   const [pollResults, setPollResults] = useState(null);
   const [students, setStudents] = useState([]);
@@ -87,7 +87,17 @@ const TeacherDashboard = ({ socket, userData }) => {
       <header className="header">
         <div className="header-content">
           <div className="logo">Live Polling System</div>
-          <div className="user-info">Teacher Dashboard</div>
+          <div className="user-info">
+            Teacher Dashboard
+            <button 
+              className="btn btn-exit" 
+              onClick={onReturnHome}
+              title="Exit to Home"
+            >
+              <LogOut size={16} />
+              Exit
+            </button>
+          </div>
         </div>
       </header>
 

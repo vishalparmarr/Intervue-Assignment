@@ -39,6 +39,29 @@
 .user-info {
   color: white;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.btn-exit {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.btn-exit:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
 }
 
 .main-content {
@@ -59,6 +82,11 @@
   }
   
   .header-content {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .user-info {
     flex-direction: column;
     gap: 10px;
   }
