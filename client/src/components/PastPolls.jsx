@@ -2,28 +2,84 @@ import React, { useState, useEffect } from 'react';
 import { Clock, Users, BarChart3, Calendar, X } from 'lucide-react';
 import PollResults from './PollResults';
 
-const PastPolls = ({ onClose }) => {
+const PastPolls = ({ onClose, socket }) => {
   const [pastPolls, setPastPolls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPoll, setSelectedPoll] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const fetchPastPolls = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // For now, let's check localStorage for any past polls
+        // In a real app, this would come from the server
+        const storedPolls = localStorage.getItem('pastPolls');
+        if (storedPolls) {
+          const parsedPolls = JSON.parse(storedPolls);
+          setPastPolls(parsedPolls);
+        } else {
+          // Demo data for testing - remove this in production
+          const demoPolls = [
+            {
+              id: 'demo-1',
+              question: 'Which planet is known as the Red Planet?',
+              startTime: Date.now() - 3600000, // 1 hour ago
+              endTime: Date.now() - 3300000,   // 55 minutes ago
+              totalParticipants: 5,
+              results: [
+                { option: 'Mars', count: 3, percentage: 60 },
+                { option: 'Venus', count: 1, percentage: 20 },
+                { option: 'Jupiter', count: 1, percentage: 20 },
+                { option: 'Saturn', count: 0, percentage: 0 }
+              ]
+            },
+            {
+              id: 'demo-2',
+              question: 'What is the capital of France?',
+              startTime: Date.now() - 7200000, // 2 hours ago
+              endTime: Date.now() - 6900000,   // 1 hour 55 minutes ago
+              totalParticipants: 8,
+              results: [
+                { option: 'Paris', count: 6, percentage: 75 },
+                { option: 'London', count: 1, percentage: 12.5 },
+                { option: 'Berlin', count: 1, percentage: 12.5 },
+                { option: 'Madrid', count: 0, percentage: 0 }
+              ]
+            }
+          ];
+          setPastPolls(demoPolls);
+        }
+        
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching past polls:', err);
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
     fetchPastPolls();
   }, []);
 
-  const fetchPastPolls = async () => {
+  const retryFetch = () => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      setLoading(true);
-      const response = await fetch('/api/past-polls');
-      if (!response.ok) {
-        throw new Error('Failed to fetch past polls');
+      const storedPolls = localStorage.getItem('pastPolls');
+      if (storedPolls) {
+        const parsedPolls = JSON.parse(storedPolls);
+        setPastPolls(parsedPolls);
+      } else {
+        setPastPolls([]);
       }
-      const data = await response.json();
-      setPastPolls(data);
+      setLoading(false);
     } catch (err) {
-      setError(err.message);
-    } finally {
+      console.error('Error loading past polls:', err);
+      setError('Failed to load past polls');
       setLoading(false);
     }
   };
@@ -69,7 +125,7 @@ const PastPolls = ({ onClose }) => {
           </div>
           <div className="modal-content">
             <p className="error">Error: {error}</p>
-            <button className="btn" onClick={fetchPastPolls}>Retry</button>
+            <button className="btn" onClick={retryFetch}>Retry</button>
           </div>
         </div>
       </div>

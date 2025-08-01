@@ -10,34 +10,17 @@ const SOCKET_URL = 'https://intervue-assignment-c5gd.onrender.com';
 
 function App() {
   const [socket, setSocket] = useState(null);
-  const [userType, setUserType] = useState(() => {
-    // Load user state from localStorage on initial render
-    const savedUserType = localStorage.getItem('userType');
-    return savedUserType || null;
-  });
-  const [userData, setUserData] = useState(() => {
-    // Load user data from localStorage on initial render
-    const savedUserData = localStorage.getItem('userData');
-    return savedUserData ? JSON.parse(savedUserData) : null;
-  });
+  const [userType, setUserType] = useState(null);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     const newSocket = io(SOCKET_URL);
     setSocket(newSocket);
 
-    // If user was previously logged in, reconnect them
-    if (userType && userData) {
-      if (userType === 'teacher') {
-        newSocket.emit('join-as-teacher');
-      } else if (userType === 'student' && userData.name) {
-        newSocket.emit('join-as-student', userData.name);
-      }
-    }
-
     return () => {
       newSocket.close();
     };
-  }, [userType, userData]);
+  }, []);
 
   const joinAsTeacher = () => {
     if (socket) {
@@ -69,6 +52,9 @@ function App() {
     localStorage.removeItem('userData');
     if (socket) {
       socket.disconnect();
+      // Reconnect fresh socket
+      const newSocket = io(SOCKET_URL);
+      setSocket(newSocket);
     }
   };
 

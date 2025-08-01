@@ -12,10 +12,14 @@ const StudentDashboard = ({ socket, userData, onReturnHome }) => {
   const [hasAnswered, setHasAnswered] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [students, setStudents] = useState([]);
   const [isKickedOut, setIsKickedOut] = useState(false);
 
   useEffect(() => {
     if (!socket) return;
+
+    // Request current students list when connecting
+    socket.emit('get-students-list');
 
     // Listen for new polls
     socket.on('new-poll', (poll) => {
@@ -43,10 +47,21 @@ const StudentDashboard = ({ socket, userData, onReturnHome }) => {
       setMessages(prev => [...prev, message]);
     });
 
+    // Listen for students list updates
+    socket.on('students-list', (studentsList) => {
+      console.log('Students list received:', studentsList);
+      console.log('Students list length:', studentsList.length);
+      setStudents(studentsList);
+    });
+
     // Listen for student removal
     socket.on('student-removed', (data) => {
-      if (data.studentName === userData.name) {
-        console.log('Student kicked out:', data.studentName);
+      console.log('Student removal event received:', data);
+      console.log('Current user data:', userData);
+      
+      // Check by name or id to ensure kick out works
+      if (data.studentName === userData.name || data.studentId === userData.name) {
+        console.log('Student kicked out:', data.studentName || data.studentId);
         setIsKickedOut(true);
         socket.disconnect();
       }
@@ -57,9 +72,10 @@ const StudentDashboard = ({ socket, userData, onReturnHome }) => {
       socket.off('poll-ended');
       socket.off('poll-results');
       socket.off('new-message');
+      socket.off('students-list');
       socket.off('student-removed');
     };
-  }, [socket]);
+  }, [socket, userData]);
 
   // Timer effect
   useEffect(() => {
@@ -105,11 +121,10 @@ const StudentDashboard = ({ socket, userData, onReturnHome }) => {
     <div className="App">
       <header className="header">
         <div className="header-content">
-          <div className="logo">Live Polling System</div>
-          <div className="user-info">
+          <div className="user-info text-black">
             Student: {userData.name}
             <button 
-              className="btn btn-exit" 
+              className="btn flex justify-end" 
               onClick={onReturnHome}
               title="Exit to Home"
             >
@@ -123,16 +138,6 @@ const StudentDashboard = ({ socket, userData, onReturnHome }) => {
       <main className="main-content">
         <div className="container">
           <div className="dashboard-header">
-            <h2>Student Dashboard</h2>
-            <div className="dashboard-actions">
-              <button 
-                className="btn btn-secondary" 
-                onClick={() => setShowChat(!showChat)}
-              >
-                <MessageSquare size={20} />
-                Chat
-              </button>
-            </div>
           </div>
 
           {currentPoll && (
@@ -188,7 +193,22 @@ const StudentDashboard = ({ socket, userData, onReturnHome }) => {
           onClose={() => setShowChat(false)}
           userType="student"
           userName={userData.name}
+          students={students}
         />
+      )}
+
+      {/* Debug: Show students count */}
+      {console.log('Current students in StudentDashboard:', students)}
+
+      {/* Floating Chat Button */}
+      {!showChat && (
+        <button 
+          className="floating-chat-btn"
+          onClick={() => setShowChat(true)}
+          title="Open Chat"
+        >
+          <MessageSquare size={24} />
+        </button>
       )}
     </div>
   );

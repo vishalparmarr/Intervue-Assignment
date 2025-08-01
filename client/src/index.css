@@ -94,8 +94,8 @@ code {
 }
 
 .input {
-  width: 100%;
-  padding: 16px 20px;
+  width: 90%;
+  padding: 10px 20px;
   border: 2px solid #e9ecef;
   border-radius: 12px;
   font-size: 16px;
@@ -290,6 +290,181 @@ code {
   justify-content: center;
 }
 
+/* Chat Tabs */
+.chat-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.chat-tab.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.chat-tab:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.chat-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.chat-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Participants List */
+.participants-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.participants-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.participants-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.participant-count {
+  font-size: 14px;
+  color: #666;
+  background: #f8f9fa;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.participants-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.participants-table {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.participant-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 12px 16px;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  align-items: center;
+}
+
+.participant-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.kick-btn {
+  padding: 6px 12px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.kick-btn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+.no-participants {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+/* Floating Chat Button */
+.floating-chat-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  z-index: 999;
+}
+
+.floating-chat-btn:hover {
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+}
+
+.floating-chat-btn:active {
+  transform: translateY(-1px) scale(1.05);
+}
+
 /* Additional component styles */
 .intervue-badge {
   display: inline-flex;
@@ -317,7 +492,6 @@ code {
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 16px;
-  color: #333;
   text-shadow: none;
 }
 
@@ -466,9 +640,9 @@ code {
   background: white;
   border-radius: 20px;
   padding: 40px;
-  max-width: 500px;
+  max-width: 800px;
   width: 90%;
-  max-height: 80vh;
+  max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -842,7 +1016,7 @@ code {
 }
 
 .kicked-out-card h1 {
-  color: #dc3545;
+  color: black;
   margin-bottom: 15px;
   font-size: 2rem;
 }
@@ -885,6 +1059,7 @@ code {
   
   .welcome-header h1 {
     font-size: 2rem;
+    text-color: white;
   }
   
   .welcome-header p {

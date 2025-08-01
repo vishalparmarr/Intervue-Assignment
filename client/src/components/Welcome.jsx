@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { MessageSquare, Users, Star } from 'lucide-react';
 
 const Welcome = ({ onJoinAsTeacher, onJoinAsStudent }) => {
   const [selectedRole, setSelectedRole] = useState(null);
@@ -32,7 +31,7 @@ const Welcome = ({ onJoinAsTeacher, onJoinAsStudent }) => {
       </div>
 
       <div className="welcome-header">
-        <h1>Welcome to the Live Polling System</h1>
+        <h1 className='text-black'>Welcome to the Live Polling System</h1>
         <p>Please select the role that best describes you to begin using the live polling system.</p>
       </div>
 
@@ -67,23 +66,36 @@ const Welcome = ({ onJoinAsTeacher, onJoinAsStudent }) => {
       {showStudentForm && (
         <div className="modal-overlay" onClick={() => setShowStudentForm(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Enter Your Name</h3>
+            {/* Intervue Poll Badge */}
+            <div className="continue-section">
+              <div className="intervue-badge continue-btn">
+                <img src="/assets/image.png" alt="Intervue Logo" height={10} width={20} />
+                <span className='text-sm'>Intervue Poll</span>
+              </div>
+            </div>
+
+            <div className="welcome-header">
+              <h1>Let's Get Started</h1>
+              <p>If you're a student, you'll be able to <strong>submit your answers</strong>, participate in live polls, and see how your responses compare with your classmates</p>
+            </div>
+
             <form onSubmit={handleStudentSubmit}>
-              <input
-                type="text"
-                className="input"
-                placeholder="Enter your name"
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
-                autoFocus
-                required
-              />
-              <div className="modal-buttons">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowStudentForm(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn">
-                  Join as Student
+              <div className="form-group">
+                <label htmlFor="studentName">Enter your Name</label>
+                <input
+                  id="studentName"
+                  type="text"
+                  className="input"
+                  placeholder="Enter your name"
+                  value={studentName}
+                  onChange={(e) => setStudentName(e.target.value)}
+                  autoFocus
+                  required
+                />
+              </div>
+              <div className="continue-section">
+                <button type="submit" className="btn continue-btn">
+                  Continue
                 </button>
               </div>
             </form>

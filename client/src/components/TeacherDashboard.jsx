@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Users, BarChart3, MessageSquare, X, LogOut, History } from 'lucide-react';
+import { Plus, BarChart3, MessageSquare, X, LogOut, History } from 'lucide-react';
 import CreatePoll from './CreatePoll';
 import PollResults from './PollResults';
-import StudentList from './StudentList';
 import Chat from './Chat';
 import PastPolls from './PastPolls';
 
@@ -25,6 +24,33 @@ const TeacherDashboard = ({ socket, userData, onReturnHome }) => {
 
     // Listen for poll end
     socket.on('poll-ended', (data) => {
+      // Save the completed poll to localStorage for past polls
+      if (activePoll && data.results) {
+        const completedPoll = {
+          id: `poll-${Date.now()}`,
+          question: activePoll.question,
+          startTime: activePoll.startTime || Date.now() - (activePoll.timeLimit * 1000),
+          endTime: Date.now(),
+          totalParticipants: data.results.reduce((total, result) => total + result.count, 0),
+          results: data.results
+        };
+
+        // Get existing polls from localStorage
+        const existingPolls = JSON.parse(localStorage.getItem('pastPolls') || '[]');
+        
+        // Add the new poll
+        existingPolls.unshift(completedPoll); // Add to beginning
+        
+        // Keep only the last 10 polls to prevent unlimited growth
+        if (existingPolls.length > 10) {
+          existingPolls.splice(10);
+        }
+        
+        // Save back to localStorage
+        localStorage.setItem('pastPolls', JSON.stringify(existingPolls));
+        console.log('Saved completed poll to localStorage:', completedPoll);
+      }
+
       setActivePoll(null);
       setPollResults(data.results);
     });
@@ -58,7 +84,7 @@ const TeacherDashboard = ({ socket, userData, onReturnHome }) => {
       socket.off('student-removed');
       socket.off('new-message');
     };
-  }, [socket]);
+  }, [socket, activePoll]);
 
   const createPoll = (pollData) => {
     socket.emit('create-poll', pollData);
@@ -88,11 +114,9 @@ const TeacherDashboard = ({ socket, userData, onReturnHome }) => {
     <div className="App">
       <header className="header">
         <div className="header-content">
-          <div className="logo">Live Polling System</div>
           <div className="user-info">
-            Teacher Dashboard
-            <button 
-              className="btn btn-exit" 
+            <button
+              className="continue-btn flex h-10 w-10  items-center justify-end text-center"
               onClick={onReturnHome}
               title="Exit to Home"
             >
@@ -105,40 +129,27 @@ const TeacherDashboard = ({ socket, userData, onReturnHome }) => {
 
       <main className="main-content">
         <div className="container">
-          <div className="dashboard-header">
-            <h2>Teacher Dashboard</h2>
-            <div className="dashboard-actions">
-              <button 
-                className="btn" 
-                onClick={() => setShowCreatePoll(true)}
-                disabled={!canCreatePoll}
-              >
-                <Plus size={20} />
-                Create New Poll
-              </button>
-              <button 
-                className="btn btn-secondary" 
-                onClick={() => setShowPastPolls(true)}
-              >
-                <History size={20} />
-                Past Polls
-              </button>
-              <button 
-                className="btn btn-secondary" 
-                onClick={() => setShowChat(!showChat)}
-              >
-                <MessageSquare size={20} />
-                Chat
-              </button>
-            </div>
+          <div className="dashboard-actions">
+            <button
+              className="btn"
+              onClick={() => setShowCreatePoll(true)}
+              disabled={!canCreatePoll}
+            >
+              <Plus size={20} />
+              Create New Poll
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setShowPastPolls(true)}
+            >
+              <History size={20} />
+              Past Polls
+            </button>
           </div>
+
 
           <div className="dashboard-grid">
             <div className="card">
-              <div className="card-header">
-                <h3><Users size={20} /> Connected Students ({students.length})</h3>
-              </div>
-              <StudentList students={students} onRemoveStudent={removeStudent} />
             </div>
 
             <div className="card">
@@ -173,8 +184,8 @@ const TeacherDashboard = ({ socket, userData, onReturnHome }) => {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Create New Poll</h3>
-              <button 
-                className="modal-close" 
+              <button
+                className="modal-close"
                 onClick={() => setShowCreatePoll(false)}
               >
                 <X size={20} />
@@ -186,16 +197,30 @@ const TeacherDashboard = ({ socket, userData, onReturnHome }) => {
       )}
 
       {showChat && (
-        <Chat 
-          messages={messages} 
-          onSendMessage={sendMessage} 
+        <Chat
+          messages={messages}
+          onSendMessage={sendMessage}
           onClose={() => setShowChat(false)}
           userType="teacher"
+          userName={userData.name}
+          students={students}
+          onKickStudent={removeStudent}
         />
       )}
 
+      {/* Floating Chat Button */}
+      {!showChat && (
+        <button
+          className="floating-chat-btn"
+          onClick={() => setShowChat(true)}
+          title="Open Chat"
+        >
+          <MessageSquare size={24} />
+        </button>
+      )}
+
       {showPastPolls && (
-        <PastPolls onClose={() => setShowPastPolls(false)} />
+        <PastPolls onClose={() => setShowPastPolls(false)} socket={socket} />
       )}
     </div>
   );

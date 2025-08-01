@@ -1,25 +1,27 @@
 import React, { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 const CreatePoll = ({ onCreatePoll, onCancel }) => {
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState(['', '']);
   const [timeLimit, setTimeLimit] = useState(60);
+  const [correctAnswers, setCorrectAnswers] = useState([true, false]);
 
   const addOption = () => {
     setOptions([...options, '']);
-  };
-
-  const removeOption = (index) => {
-    if (options.length > 2) {
-      setOptions(options.filter((_, i) => i !== index));
-    }
+    setCorrectAnswers([...correctAnswers, false]);
   };
 
   const updateOption = (index, value) => {
     const newOptions = [...options];
     newOptions[index] = value;
     setOptions(newOptions);
+  };
+
+  const updateCorrectAnswer = (index, isCorrect) => {
+    const newCorrectAnswers = [...correctAnswers];
+    newCorrectAnswers[index] = isCorrect;
+    setCorrectAnswers(newCorrectAnswers);
   };
 
   const handleSubmit = (e) => {
@@ -39,83 +41,121 @@ const CreatePoll = ({ onCreatePoll, onCancel }) => {
     onCreatePoll({
       question: question.trim(),
       options: validOptions,
-      timeLimit: parseInt(timeLimit)
+      timeLimit: parseInt(timeLimit),
+      correctAnswers: correctAnswers
     });
   };
 
+  const handleQuestionChange = (e) => {
+    if (e.target.value.length <= 100) {
+      setQuestion(e.target.value);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="form-group">
-        <label className="form-label">Question</label>
-        <input
-          type="text"
-          className="input"
-          placeholder="Enter your question..."
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          required
-        />
+    <div className="poll-question">
+      {/* Intervue Poll Badge */}
+      <div className="continue-section items-start">
+        <div className="intervue-badge continue-btn items-start place-content-start">
+          <img src="/assets/image.png" alt="Intervue Logo" height={10} width={20} />
+          <span className='text-sm'>Intervue Poll</span>
+        </div>
       </div>
 
-      <div className="form-group">
-        <label className="form-label">Options</label>
-        {options.map((option, index) => (
-          <div key={index} className="option-input-group">
-            <input
-              type="text"
-              className="input"
-              placeholder={`Option ${index + 1}`}
-              value={option}
-              onChange={(e) => updateOption(index, e.target.value)}
+        <h1 className='text-black text-start text-2xl font-bold'>Let's Get Started</h1>
+        <p className='text-start text-base'>You'll have the ability to create and manage polls, ask questions, and monitor your students' responses in real-time.</p>
+
+
+      <form onSubmit={handleSubmit} className="poll-creation-form">
+        <div className="form-group">
+          <div className="question-header">
+            <p className='text-start font-bold'>Enter your question</p>
+            <div className="time-selector text-end font-bold">
+              <select 
+                className="time-dropdown bg-[#b4b4b4] "
+                value={timeLimit}
+                onChange={(e) => setTimeLimit(e.target.value)}
+              >
+                <option value={30}>30 seconds</option>
+                <option value={60}>60 seconds</option>
+                <option value={90}>90 seconds</option>
+                <option value={120}>120 seconds</option>
+                <option value={300}>5 minutes</option>
+              </select>
+            </div>
+          </div>
+          <div className="question-input-container">
+            <textarea
+              id="question"
+              className="question-input bg-[#b4b4b4] size-50 w-full rounded-md"
+              placeholder="Rahul Bajaj"
+              value={question}
+              onChange={handleQuestionChange}
+              maxLength={100}
               required
             />
-            {options.length > 2 && (
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={() => removeOption(index)}
-                style={{ marginLeft: '10px', padding: '8px 12px' }}
-              >
-                <Trash2 size={16} />
-              </button>
-            )}
+            <div className="character-counter">{question.length}/100</div>
           </div>
-        ))}
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={addOption}
-          style={{ marginTop: '10px' }}
-        >
-          <Plus size={16} />
-          Add Option
-        </button>
-      </div>
+        </div>
 
-      <div className="form-group">
-        <label className="form-label">Time Limit (seconds)</label>
-        <select
-          className="input"
-          value={timeLimit}
-          onChange={(e) => setTimeLimit(e.target.value)}
-        >
-          <option value={30}>30 seconds</option>
-          <option value={60}>60 seconds</option>
-          <option value={90}>90 seconds</option>
-          <option value={120}>2 minutes</option>
-          <option value={300}>5 minutes</option>
-        </select>
-      </div>
+        <div className="options-section">
+          <div className="options-header">
+            <h3 className='flex'>Edit Options</h3>
+            <h3>Is it Correct?</h3>
+          </div>
+          
+          {options.map((option, index) => (
+            <div key={index} className="option-row">
+              <div className="option-input-group">
+                <span className="option-number">{index + 1}</span>
+                <input
+                  type="text"
+                  className="option-input bg-[#b4b4b4] rounded-md font-bold h-8 text-black"
+                  placeholder="Rahul Bajaj"
+                  value={option}
+                  onChange={(e) => updateOption(index, e.target.value)}
+                  required
+                />
+              </div>
+              
+              <div className="correct-answer-group ">
+                <label className="radio-option">
+                  <input
+                    type="radio"
+                    name={`correct-${index}`}
+                    checked={correctAnswers[index] === true}
+                    onChange={() => updateCorrectAnswer(index, true)}
+                  />
+                  <span className="radio-text">Yes</span>
+                </label>
+                <label className="radio-option">
+                  <input
+                    type="radio"
+                    name={`correct-${index}`}
+                    checked={correctAnswers[index] === false}
+                    onChange={() => updateCorrectAnswer(index, false)}
+                  />
+                  <span className="radio-text">No</span>
+                </label>
+              </div>
+            </div>
+          ))}
+          
+          {options.length < 6 && (
+            <button type="button" className="add-option-btn flex border-1 rounded-xl border-purple-400 text-purple-400 w-45" onClick={addOption}>
+              <Plus size={22} />
+              Add More option
+            </button>
+          )}
+        </div>
 
-      <div className="form-actions">
-        <button type="button" className="btn btn-secondary" onClick={onCancel}>
-          Cancel
-        </button>
-        <button type="submit" className="btn">
-          Create Poll
-        </button>
-      </div>
-    </form>
+        <div className="continue-section flex justify-end">
+          <button type="submit" className="btn continue-btn ">
+            Ask Question
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 

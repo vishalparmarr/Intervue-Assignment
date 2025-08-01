@@ -38,6 +38,11 @@ io.on('connection', (socket) => {
   socket.on('join-as-teacher', () => {
     socket.join('teacher');
     socket.emit('teacher-joined');
+    
+    // Send current students list to teacher
+    const studentsList = getStudentsList();
+    socket.emit('students-list', studentsList);
+    
     console.log('Teacher joined');
   });
 
@@ -52,6 +57,11 @@ io.on('connection', (socket) => {
     socket.join('students');
     socket.emit('student-joined', { studentId, studentName });
     io.to('teacher').emit('student-joined', { studentId, studentName });
+    
+    // Send updated students list to all clients
+    const studentsList = getStudentsList();
+    io.emit('students-list', studentsList);
+    
     console.log(`Student joined: ${studentName}`);
   });
 
@@ -136,6 +146,12 @@ io.on('connection', (socket) => {
     });
   });
 
+  // Get current students list
+  socket.on('get-students-list', () => {
+    const studentsList = getStudentsList();
+    socket.emit('students-list', studentsList);
+  });
+
   // Remove student (teacher only)
   socket.on('remove-student', (studentId) => {
     const userToRemove = Array.from(users.entries()).find(([_, user]) => user.id === studentId);
@@ -148,6 +164,10 @@ io.on('connection', (socket) => {
       
       // Notify teacher
       io.to('teacher').emit('student-removed', { studentId, studentName: user.name });
+      
+      // Send updated students list to all clients
+      const studentsList = getStudentsList();
+      io.emit('students-list', studentsList);
       
       // Disconnect the student after a short delay to ensure they receive the message
       setTimeout(() => {
@@ -178,11 +198,31 @@ io.on('connection', (socket) => {
     if (user) {
       users.delete(socket.id);
       io.to('teacher').emit('student-left', { studentName: user.name });
+      
+      // Send updated students list to all clients
+      const studentsList = getStudentsList();
+      io.emit('students-list', studentsList);
+      
       console.log(`Student disconnected: ${user.name}`);
     }
     console.log('User disconnected:', socket.id);
   });
 });
+
+// Helper function to get students list
+function getStudentsList() {
+  const studentsList = [];
+  users.forEach((user, socketId) => {
+    if (user.type === 'student') {
+      studentsList.push({
+        studentId: user.id,
+        studentName: user.name,
+        name: user.name
+      });
+    }
+  });
+  return studentsList;
+}
 
 // Helper function to get poll results
 function getPollResults() {
