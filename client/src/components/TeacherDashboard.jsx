@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Users, BarChart3, MessageSquare, X, LogOut } from 'lucide-react';
+import { Plus, Users, BarChart3, MessageSquare, X, LogOut, History } from 'lucide-react';
 import CreatePoll from './CreatePoll';
 import PollResults from './PollResults';
 import StudentList from './StudentList';
 import Chat from './Chat';
+import PastPolls from './PastPolls';
 
 const TeacherDashboard = ({ socket, userData, onReturnHome }) => {
   const [activePoll, setActivePoll] = useState(null);
@@ -11,6 +12,7 @@ const TeacherDashboard = ({ socket, userData, onReturnHome }) => {
   const [students, setStudents] = useState([]);
   const [showCreatePoll, setShowCreatePoll] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [showPastPolls, setShowPastPolls] = useState(false);
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
@@ -116,6 +118,13 @@ const TeacherDashboard = ({ socket, userData, onReturnHome }) => {
               </button>
               <button 
                 className="btn btn-secondary" 
+                onClick={() => setShowPastPolls(true)}
+              >
+                <History size={20} />
+                Past Polls
+              </button>
+              <button 
+                className="btn btn-secondary" 
                 onClick={() => setShowChat(!showChat)}
               >
                 <MessageSquare size={20} />
@@ -183,6 +192,10 @@ const TeacherDashboard = ({ socket, userData, onReturnHome }) => {
           onClose={() => setShowChat(false)}
           userType="teacher"
         />
+      )}
+
+      {showPastPolls && (
+        <PastPolls onClose={() => setShowPastPolls(false)} />
       )}
     </div>
   );

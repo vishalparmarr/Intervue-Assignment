@@ -19,6 +19,7 @@ app.use(express.json());
 // Store active polls and users
 const polls = new Map();
 const users = new Map();
+const pastPolls = []; // Store past poll results
 const activePoll = {
   id: null,
   question: '',
@@ -77,9 +78,24 @@ io.on('connection', (socket) => {
     setTimeout(() => {
       if (activePoll.isActive) {
         activePoll.isActive = false;
+        const results = getPollResults();
+        
+        // Save poll to past polls
+        const pastPoll = {
+          id: activePoll.id,
+          question: activePoll.question,
+          options: activePoll.options,
+          timeLimit: activePoll.timeLimit,
+          startTime: activePoll.startTime,
+          endTime: Date.now(),
+          results: results,
+          totalParticipants: results.totalAnswers
+        };
+        pastPolls.push(pastPoll);
+        
         io.to('students').emit('poll-ended');
         io.to('teacher').emit('poll-ended', {
-          results: getPollResults()
+          results: results
         });
       }
     }, activePoll.timeLimit * 1000);
@@ -210,6 +226,21 @@ app.get('/api/current-poll', (req, res) => {
     });
   } else {
     res.json({ isActive: false });
+  }
+});
+
+// Get past poll results
+app.get('/api/past-polls', (req, res) => {
+  res.json(pastPolls);
+});
+
+// Get specific past poll by ID
+app.get('/api/past-polls/:id', (req, res) => {
+  const poll = pastPolls.find(p => p.id === req.params.id);
+  if (poll) {
+    res.json(poll);
+  } else {
+    res.status(404).json({ error: 'Poll not found' });
   }
 });
 

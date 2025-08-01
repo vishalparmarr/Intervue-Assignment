@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { MessageSquare, Users } from 'lucide-react';
+import { MessageSquare, Users, Star } from 'lucide-react';
 
 const Welcome = ({ onJoinAsTeacher, onJoinAsStudent }) => {
+  const [selectedRole, setSelectedRole] = useState(null);
   const [studentName, setStudentName] = useState('');
   const [showStudentForm, setShowStudentForm] = useState(false);
 
@@ -12,41 +13,55 @@ const Welcome = ({ onJoinAsTeacher, onJoinAsStudent }) => {
     }
   };
 
+  const handleContinue = () => {
+    if (selectedRole === 'teacher') {
+      onJoinAsTeacher();
+    } else if (selectedRole === 'student') {
+      setShowStudentForm(true);
+    }
+  };
+
   return (
     <div className="container">
+      {/* Intervue Poll Badge */}
+      <div className="continue-section">
+        <div className="intervue-badge continue-btn">
+          <img src="/assets/image.png" alt="Intervue Logo" height={10} width={20} />
+          <span className='text-sm'>Intervue Poll</span>
+        </div>
+      </div>
+
       <div className="welcome-header">
-        <h1>Live Polling System</h1>
-        <p>Choose your role to get started</p>
+        <h1>Welcome to the Live Polling System</h1>
+        <p>Please select the role that best describes you to begin using the live polling system.</p>
       </div>
 
       <div className="role-selection">
-        <div className="role-card" onClick={onJoinAsTeacher}>
-          <div className="role-icon">
-            <MessageSquare size={48} />
-          </div>
-          <h3>Join as Teacher</h3>
-          <p>Create polls and view live results</p>
-          <ul>
-            <li>Create new polls</li>
-            <li>View live results</li>
-            <li>Manage students</li>
-            <li>Chat with students</li>
-          </ul>
+        <div 
+          className={`role-card ${selectedRole === 'student' ? 'selected' : ''}`}
+          onClick={() => setSelectedRole('student')}
+        >
+          <h3>I'm a Student</h3>
+          <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
         </div>
 
-        <div className="role-card" onClick={() => setShowStudentForm(true)}>
-          <div className="role-icon">
-            <Users size={48} />
-          </div>
-          <h3>Join as Student</h3>
-          <p>Answer polls and see results</p>
-          <ul>
-            <li>Answer questions</li>
-            <li>View live results</li>
-            <li>60-second time limit</li>
-            <li>Chat with teacher</li>
-          </ul>
+        <div 
+          className={`role-card ${selectedRole === 'teacher' ? 'selected' : ''}`}
+          onClick={() => setSelectedRole('teacher')}
+        >
+          <h3>I'm a Teacher</h3>
+          <p>Submit answers and view live poll results in real-time.</p>
         </div>
+      </div>
+
+      <div className="continue-section">
+        <button 
+          className="btn continue-btn" 
+          onClick={handleContinue}
+          disabled={!selectedRole}
+        >
+          Continue
+        </button>
       </div>
 
       {showStudentForm && (
